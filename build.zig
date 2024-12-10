@@ -36,10 +36,11 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    sdl_lib.step.dependOn(&configure_sdl_with_cmake.step);
+    build_sdl_with_cmake.step.dependOn(&configure_sdl_with_cmake.step);
+
     sdl_lib.step.dependOn(&build_sdl_with_cmake.step);
-    sdl_lib.addIncludePath(b.path("lib/include"));
-    sdl_lib.addLibraryPath(b.path("lib/lib"));
+    sdl_lib.addIncludePath(.{ .cwd_relative = "lib/include" });
+    sdl_lib.addLibraryPath(.{ .cwd_relative = "lib/lib" });
     sdl_lib.linkSystemLibrary("SDL3-static");
     sdl_lib.linkLibC();
 
