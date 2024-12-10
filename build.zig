@@ -1,9 +1,6 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
-
     const configure_sdl_with_cmake = b.addSystemCommand(&[_][]const u8{
         "cmake",
         "-S",
@@ -29,20 +26,14 @@ pub fn build(b: *std.Build) void {
         "Release",
     });
 
-    const sdl_lib = b.addStaticLibrary(.{
-        .name = "SDL",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+    build_sdl_with_cmake.step.dependOn(&configure_sdl_with_cmake.step);
+    b.getInstallStep().dependOn(&build_sdl_with_cmake.step);
+
+    _ = b.addModule("SDL.lib", .{
+        .root_source_file = b.path("lib/lib"),
     });
 
-    build_sdl_with_cmake.step.dependOn(&configure_sdl_with_cmake.step);
-
-    sdl_lib.step.dependOn(&build_sdl_with_cmake.step);
-    sdl_lib.addIncludePath(.{ .cwd_relative = "lib/include" });
-    sdl_lib.addLibraryPath(.{ .cwd_relative = "lib/lib" });
-    sdl_lib.linkSystemLibrary("SDL3-static");
-    sdl_lib.linkLibC();
-
-    b.installArtifact(sdl_lib);
+    _ = b.addModule("SDL.include", .{
+        .root_source_file = b.path("lib/include"),
+    });
 }
