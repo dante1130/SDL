@@ -1,6 +1,9 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
     const configure_sdl_with_cmake = b.addSystemCommand(&[_][]const u8{
         "cmake",
         "-S",
@@ -29,11 +32,13 @@ pub fn build(b: *std.Build) void {
     build_sdl_with_cmake.step.dependOn(&configure_sdl_with_cmake.step);
     b.getInstallStep().dependOn(&build_sdl_with_cmake.step);
 
-    _ = b.addModule("SDL.lib", .{
-        .root_source_file = b.path("lib/lib"),
+    const sdl_lib = b.addModule("SDL.lib", .{
+        .link_libc = true,
+        .target = target,
+        .optimize = optimize,
     });
 
-    _ = b.addModule("SDL.include", .{
-        .root_source_file = b.path("lib/include"),
-    });
+    sdl_lib.addLibraryPath(b.path("lib/lib"));
+    sdl_lib.addIncludePath(b.path("lib/include"));
+    sdl_lib.linkSystemLibrary("SDL3-static", .{ .preferred_link_mode = .static });
 }
