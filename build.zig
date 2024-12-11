@@ -28,4 +28,6 @@ pub fn build(b: *std.Build) void {
 
     build_sdl_with_cmake.step.dependOn(&configure_sdl_with_cmake.step);
     b.getInstallStep().dependOn(&build_sdl_with_cmake.step);
+
+    b.installBinFile("lib/bin/SDL3.dll", "SDL3.dll");
 }
