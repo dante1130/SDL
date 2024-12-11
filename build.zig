@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) void {
         "-DSDL_SHARED=ON",
         "-DSDL_STATIC=OFF",
         "-DSDL_TEST_LIBRARY=OFF",
-        "-DSDL_TEST=OFF",
+        "-DSDL_TESTS=OFF",
         "-DSDL_INSTALL_TESTS=OFF",
     });
 
@@ -28,6 +28,4 @@ pub fn build(b: *std.Build) void {
 
     build_sdl_with_cmake.step.dependOn(&configure_sdl_with_cmake.step);
     b.getInstallStep().dependOn(&build_sdl_with_cmake.step);
-
-    b.installBinFile("lib/bin/SDL3.dll", "SDL3.dll");
 }
